@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Product = require("../models/Product");
+const Category = require("../models/Category");
 
 router.post("/", async (req, res) => {
   try {
@@ -21,7 +22,20 @@ router.post("/", async (req, res) => {
 router.get("/allProducts", async (req, res) => {
   try {
     const products = await Product.find();
-    res.send(products);
+
+    const outPut = [];
+
+    for (const product of products) {
+      const category = await Category.findById(product.categoryId);
+
+      const productTemp = {
+        product,
+        categoryName: category.name,
+      };
+      outPut.push(productTemp);
+    }
+
+    res.send(outPut);
   } catch (error) {
     res.send(error.message);
   }
